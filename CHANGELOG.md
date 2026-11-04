@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/dryvist/llm-prompt-evals/compare/v0.4.0...v0.5.0) (2026-11-03)
+
+
+### Features
+
+* **evals:** route the held-out suite through the org router ([#144](https://github.com/dryvist/llm-prompt-evals/issues/144)) ([83244a2](https://github.com/dryvist/llm-prompt-evals/commit/83244a28fe0698147b8399858a56e19e0b1b4227))
+
 ## [0.4.0](https://github.com/dryvist/llm-prompt-evals/compare/v0.3.0...v0.4.0) (2026-10-26)
 
 
