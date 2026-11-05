@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1](https://github.com/dryvist/llm-prompt-evals/compare/v0.5.0...v0.5.1) (2026-11-05)
+
+
+### Bug Fixes
+
+* **evals:** grade the fabric eval on the local router ([#151](https://github.com/dryvist/llm-prompt-evals/issues/151)) ([c1efe64](https://github.com/dryvist/llm-prompt-evals/commit/c1efe6490a32d4f49d9fa3b97afafbb74172874a))
+
 ## [0.5.0](https://github.com/dryvist/llm-prompt-evals/compare/v0.4.0...v0.5.0) (2026-11-03)
 
 
