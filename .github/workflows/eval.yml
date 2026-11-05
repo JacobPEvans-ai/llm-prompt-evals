@@ -80,6 +80,7 @@ jobs:
           disable-comment: true
           fail-on-threshold: 85
         env:
-          # Local fabric endpoint (secret) and model id (variable), set in Actions settings.
+          # Local fabric endpoint and key (secrets), model id (variable), set in Actions settings.
           LOCAL_FABRIC_BASE_URL: ${{ secrets.LOCAL_FABRIC_BASE_URL }}
           LOCAL_FABRIC_MODEL: ${{ vars.LOCAL_FABRIC_MODEL }}
+          LOCAL_FABRIC_API_KEY: ${{ secrets.LOCAL_FABRIC_API_KEY }}
