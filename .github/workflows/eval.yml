@@ -67,7 +67,7 @@ jobs:
       # Puts Node 22 and npx on PATH for promptfoo-action.
       - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
         with:
-          node-version: "22"
+          node-version: ">=22.22.0 <23"
       - uses: promptfoo/promptfoo-action@04839e664f52212b877170219dab0d7ad2bf6440 # v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
