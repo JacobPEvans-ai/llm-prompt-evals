@@ -1,11 +1,13 @@
 # yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
 #
-# Fabric variant of promptfooconfig.yaml: the same prompts, tests, and grader,
-# but run against the local OpenAI-compatible fabric (providers/local.yaml).
+# Fabric variant of promptfooconfig.yaml: the same prompts and tests, run against
+# the local OpenAI-compatible fabric (providers/local.yaml), with the local
+# fabric as the only grader.
 # The CI fabric job and any local fabric run use this file.
 #
-# Keep prompts / defaultTest / tests IN SYNC with promptfooconfig.yaml — only the
-# providers line differs. (promptfoo has no config inheritance, hence the copy.)
+# Keep prompts and tests IN SYNC with promptfooconfig.yaml. The providers and
+# defaultTest lines differ on purpose. (promptfoo has no config inheritance, hence
+# the copy.)
 description: "Hermes system prompt — local fabric"
 
 prompts:
@@ -23,10 +25,13 @@ providers:
 
 defaultTest:
   options:
+    # Grader: the local fabric only. Fail closed: when LOCAL_FABRIC_BASE_URL is
+    # unset or empty, apiBaseUrl becomes a non-URL, so each request fails before
+    # any network I/O.
     provider:
       id: "openai:chat:{{ env.LOCAL_FABRIC_MODEL }}"
       config:
-        apiBaseUrl: "{{ env.LOCAL_FABRIC_BASE_URL }}"
+        apiBaseUrl: "{{ env.LOCAL_FABRIC_BASE_URL | default('LOCAL_FABRIC_BASE_URL is unset', true) }}"
         apiKey: "{{ env.LOCAL_FABRIC_API_KEY | default('sk-local-noauth') }}"
         temperature: 0
 
