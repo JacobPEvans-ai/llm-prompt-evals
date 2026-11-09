@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.7.0](https://github.com/dryvist/llm-prompt-evals/compare/v0.6.0...v0.7.0) (2026-11-09)
+
+
+### Features
+
+* **agent:** opencode-local run j-f7cbc48399294f21 ([3d7b49b](https://github.com/dryvist/llm-prompt-evals/commit/3d7b49bd6aa5458382aaa0446466b431b793a41d))
+
+
+### Bug Fixes
+
+* **ci:** set up Node before promptfoo on the self-hosted runners ([#175](https://github.com/dryvist/llm-prompt-evals/issues/175)) ([8e42b16](https://github.com/dryvist/llm-prompt-evals/commit/8e42b16ba3faa2e61aa97e12bb2b5605fc418d01))
+* **fabric:** make the triage and spl suite configs validate under promptfoo 0.124.1 ([#178](https://github.com/dryvist/llm-prompt-evals/issues/178)) ([3d7b49b](https://github.com/dryvist/llm-prompt-evals/commit/3d7b49bd6aa5458382aaa0446466b431b793a41d))
+
 ## [0.6.0](https://github.com/dryvist/llm-prompt-evals/compare/v0.5.1...v0.6.0) (2026-11-09)
 
 
