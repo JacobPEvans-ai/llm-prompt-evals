@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.8.0](https://github.com/dryvist/llm-prompt-evals/compare/v0.7.0...v0.8.0) (2026-11-09)
+
+
+### Features
+
+* **agent:** opencode-local run j-3c547b78f4801bc1 ([bf1a245](https://github.com/dryvist/llm-prompt-evals/commit/bf1a24562555e742342169307053eacdcfdf8488))
+* **agent:** opencode-local run j-5e04b33111213103 ([3a1b977](https://github.com/dryvist/llm-prompt-evals/commit/3a1b97766942153d0c34a90371da9adaf7261b10))
+* **evals:** read the benchmark router key through OpenBao and run all fabric suites ([#184](https://github.com/dryvist/llm-prompt-evals/issues/184)) ([dccdf43](https://github.com/dryvist/llm-prompt-evals/commit/dccdf43c322fb7c6d4a93b494a29ee163a54fd0c))
+
+
+### Bug Fixes
+
+* **evals:** run the agentic and tool-queries suites on the local fabric ([#181](https://github.com/dryvist/llm-prompt-evals/issues/181)) ([bf1a245](https://github.com/dryvist/llm-prompt-evals/commit/bf1a24562555e742342169307053eacdcfdf8488))
+* **evals:** run the agentic-mcp suite on the local fabric ([#182](https://github.com/dryvist/llm-prompt-evals/issues/182)) ([3a1b977](https://github.com/dryvist/llm-prompt-evals/commit/3a1b97766942153d0c34a90371da9adaf7261b10))
+
 ## [0.7.0](https://github.com/dryvist/llm-prompt-evals/compare/v0.6.0...v0.7.0) (2026-11-09)
 
 
