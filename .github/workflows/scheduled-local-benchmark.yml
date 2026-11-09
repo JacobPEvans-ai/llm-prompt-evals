@@ -1,0 +1,118 @@
+name: Scheduled local benchmark
+
+on:
+  schedule:
+    - cron: "23 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: scheduled-local-benchmark
+  cancel-in-progress: false
+
+jobs:
+  benchmark:
+    runs-on: [self-hosted, Linux]
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        model: [medium, small, large]
+    env:
+      LOCAL_FABRIC_MODEL: ${{ matrix.model }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          submodules: true
+
+      - name: Check optional large capability
+        id: capability
+        env:
+          MODEL: ${{ matrix.model }}
+        run: |
+          if [ "$MODEL" != large ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [ -z "${LOCAL_FABRIC_BASE_URL:-}" ]; then
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "The local router URL is unavailable; skipping the optional large capability."
+            exit 0
+          fi
+          response="$RUNNER_TEMP/local-fabric-models.json"
+          if ! curl --fail --silent --noproxy '*' \
+            --header "Authorization: Bearer ${LOCAL_FABRIC_API_KEY:-sk-local-noauth}" \
+            --output "$response" \
+            "${LOCAL_FABRIC_BASE_URL%/}/models"; then
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "The optional large capability could not be queried; skipping it."
+            exit 0
+          fi
+
+          jq -e '.data | type == "array"' "$response" >/dev/null
+          if jq -e --arg model "$MODEL" 'any(.data[]; .id == $model)' "$response" >/dev/null; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "The router does not advertise the optional large capability; skipping it."
+          fi
+
+      - name: Set run date
+        id: run-date
+        run: echo "date=$(date -u +%F)" >> "$GITHUB_OUTPUT"
+
+      - name: Run Hermes fabric suite
+        if: steps.capability.outputs.available == 'true'
+        uses: promptfoo/promptfoo-action@04839e664f52212b877170219dab0d7ad2bf6440 # v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          config: evals/hermes/promptfooconfig.fabric.yaml
+          cache-path: .promptfoo-cache
+          promptfoo-version: 0.124.1
+          use-config-prompts: true
+          force-run: true
+          no-share: true
+          disable-comment: true
+        env:
+          PROMPTFOO_OUTPUT_PATH: results/hermes-${{ matrix.model }}-${{ steps.run-date.outputs.date }}.json
+
+      - name: Upload Hermes results
+        if: always() && steps.capability.outputs.available == 'true' && hashFiles(format('results/hermes-{0}-{1}.json', matrix.model, steps.run-date.outputs.date)) != ''
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: hermes-${{ matrix.model }}-${{ steps.run-date.outputs.date }}
+          path: results/hermes-${{ matrix.model }}-${{ steps.run-date.outputs.date }}.json
+
+      - name: Write pass-rate summary
+        if: always()
+        env:
+          MODEL: ${{ matrix.model }}
+          RUN_DATE: ${{ steps.run-date.outputs.date }}
+          AVAILABLE: ${{ steps.capability.outputs.available }}
+        run: |
+          {
+            echo "## Local benchmark: ${MODEL} (${RUN_DATE})"
+            if [ "$AVAILABLE" != true ]; then
+              echo "The optional large capability was not available; the suite was skipped."
+              exit 0
+            fi
+            echo "| Suite | Pass | Fail | Errors | Pass rate |"
+            echo "| --- | ---: | ---: | ---: | ---: |"
+            file="results/hermes-${MODEL}-${RUN_DATE}.json"
+            if [ -f "$file" ]; then
+              jq -r '
+                (.results.stats // .stats // {}) as $stats
+                | ($stats.successes // 0) as $passed
+                | ($stats.failures // 0) as $failed
+                | ($stats.errors // 0) as $errors
+                | ($passed + $failed + $errors) as $total
+                | "| Hermes | \($passed) | \($failed) | \($errors) | \(if $total == 0 then "n/a" else (((10000 * $passed / $total) | round) / 100 | tostring) + "%" end) |"
+              ' "$file"
+            else
+              echo "| Hermes | — | — | — | no result |"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

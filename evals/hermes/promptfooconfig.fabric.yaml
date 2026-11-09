@@ -10,6 +10,8 @@
 # the copy.)
 description: "Hermes system prompt — local fabric"
 
+outputPath: "{{ env.PROMPTFOO_OUTPUT_PATH }}"
+
 prompts:
   - id: file://../../prompts/load_okf.py:load_prompt
     label: hermes-canonical
@@ -29,7 +31,7 @@ defaultTest:
     # unset or empty, apiBaseUrl becomes a non-URL, so each request fails before
     # any network I/O.
     provider:
-      id: "openai:chat:{{ env.LOCAL_FABRIC_MODEL }}"
+      id: "openai:chat:medium"
       config:
         apiBaseUrl: "{{ env.LOCAL_FABRIC_BASE_URL | default('LOCAL_FABRIC_BASE_URL is unset', true) }}"
         apiKey: "{{ env.LOCAL_FABRIC_API_KEY | default('sk-local-noauth') }}"
