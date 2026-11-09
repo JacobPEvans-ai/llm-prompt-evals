@@ -1,4 +1,5 @@
 # yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+# Runs against the local fabric (providers/local.yaml).
 description: Read-only single-step and history-based agent tool evaluation
 
 prompts:
@@ -12,11 +13,12 @@ prompts:
     Current request: {{ request }}
 
 providers:
-  - id: openai:chat:{{ env.LITELLM_MODEL }}
+  - id: "openai:chat:{{ env.LOCAL_FABRIC_MODEL }}"
+    label: local-fabric
     config:
-      apiBaseUrl: "{{ env.LITELLM_BASE_URL }}"
-      apiKeyEnvar: LITELLM_API_KEY
-      reasoning_effort: none
+      apiBaseUrl: "{{ env.LOCAL_FABRIC_BASE_URL | default('LOCAL_FABRIC_BASE_URL is unset', true) }}"
+      apiKey: "{{ env.LOCAL_FABRIC_API_KEY | default('sk-local-noauth') }}"
+      temperature: 0
       tools: file://../../tools/query-tools.yaml
       tool_choice: auto
 
