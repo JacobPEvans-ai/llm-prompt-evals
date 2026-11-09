@@ -1,4 +1,5 @@
 # yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+# Runs against the local fabric (providers/local.yaml) with the medium grader.
 description: Read-only agentic MCP tool-use evaluation
 
 prompts:
@@ -13,11 +14,12 @@ prompts:
     Request: {{ request }}
 
 providers:
-  - id: openai:chat:{{ env.LITELLM_MODEL }}
+  - id: "openai:chat:{{ env.LOCAL_FABRIC_MODEL }}"
+    label: local-fabric
     config:
-      apiBaseUrl: "{{ env.LITELLM_BASE_URL }}"
-      apiKeyEnvar: LITELLM_API_KEY
-      reasoning_effort: none
+      apiBaseUrl: "{{ env.LOCAL_FABRIC_BASE_URL | default('LOCAL_FABRIC_BASE_URL is unset', true) }}"
+      apiKey: "{{ env.LOCAL_FABRIC_API_KEY | default('sk-local-noauth') }}"
+      temperature: 0
       mcp:
         enabled: true
         server:
@@ -32,11 +34,11 @@ tests: file://../../datasets/agentic-mcp/cases.jsonl
 defaultTest:
   options:
     provider:
-      id: openai:chat:{{ env.LITELLM_JUDGE_MODEL }}
+      id: "openai:chat:medium"
       config:
-        apiBaseUrl: "{{ env.LITELLM_BASE_URL }}"
-        apiKeyEnvar: LITELLM_API_KEY
-        reasoning_effort: none
+        apiBaseUrl: "{{ env.LOCAL_FABRIC_BASE_URL | default('LOCAL_FABRIC_BASE_URL is unset', true) }}"
+        apiKey: "{{ env.LOCAL_FABRIC_API_KEY | default('sk-local-noauth') }}"
+        temperature: 0
   assert:
     - type: is-valid-openai-tools-call
     - type: javascript
