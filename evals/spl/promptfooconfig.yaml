@@ -1,4 +1,5 @@
 # yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+# Runs against the local fabric (providers/local.yaml) with the medium grader.
 description: Synthetic NL-to-SPL query evaluation
 
 prompts:
@@ -11,20 +12,16 @@ prompts:
     Request: {{ request }}
 
 providers:
-  - id: openai:chat:{{ env.LITELLM_MODEL }}
-    config:
-      apiBaseUrl: "{{ env.LITELLM_BASE_URL }}"
-      apiKeyEnvar: LITELLM_API_KEY
-      reasoning_effort: none
+  - file://../../providers/local.yaml
 
 defaultTest:
   options:
     provider:
-      id: openai:chat:{{ env.LITELLM_JUDGE_MODEL }}
+      id: "openai:chat:medium"
       config:
-        apiBaseUrl: "{{ env.LITELLM_BASE_URL }}"
-        apiKeyEnvar: LITELLM_API_KEY
-        reasoning_effort: none
+        apiBaseUrl: "{{ env.LOCAL_FABRIC_BASE_URL | default('LOCAL_FABRIC_BASE_URL is unset', true) }}"
+        apiKey: "{{ env.LOCAL_FABRIC_API_KEY | default('sk-local-noauth') }}"
+        temperature: 0
   assert:
     - type: regex
       value: '^\s*search\s+index=fixture_events\b.*\|'
