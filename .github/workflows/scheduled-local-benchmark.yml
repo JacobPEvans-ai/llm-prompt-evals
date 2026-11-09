@@ -1,5 +1,10 @@
 name: Scheduled local benchmark
 
+# Each value is a vault-action selector: `<mount>/data/<path> <field>`, read with the `ci-evals` role.
+env:
+  OPENBAO_EVALS_KEY_PATH: "secret/data/apps/evals evals_llm_router_key"
+  OPENBAO_ROUTER_URL_PATH: "config/data/ci-ai-review base_url"
+
 on:
   schedule:
     - cron: "23 */6 * * *"
@@ -15,7 +20,10 @@ concurrency:
 jobs:
   benchmark:
     runs-on: [self-hosted, Linux]
-    timeout-minutes: 150
+    permissions:
+      contents: read
+      id-token: write
+    timeout-minutes: 300
     strategy:
       fail-fast: false
       max-parallel: 1
@@ -28,10 +36,41 @@ jobs:
         with:
           submodules: true
 
+      - name: Resolve OpenBao address
+        id: bao
+        run: |
+          test -n "${OPENBAO_ADDR:-}" || { echo "::error::OPENBAO_ADDR is not set on this runner" >&2; exit 1; }
+          echo "addr=$OPENBAO_ADDR" >> "$GITHUB_OUTPUT"
+
+      - name: Read benchmark router credentials from OpenBao
+        id: router-creds
+        uses: hashicorp/vault-action@892a26828f195e65540a40b4768ae4571f51ebfc # v4.0.0
+        with:
+          url: ${{ steps.bao.outputs.addr }}
+          method: jwt
+          path: github-actions
+          role: ci-evals
+          jwtGithubAudience: openbao
+          exportEnv: false
+          exportToken: false
+          secrets: |
+            ${{ env.OPENBAO_EVALS_KEY_PATH }} | LOCAL_FABRIC_API_KEY ;
+            ${{ env.OPENBAO_ROUTER_URL_PATH }} | LOCAL_FABRIC_BASE_URL ;
+
+      - name: Verify benchmark router credentials
+        env:
+          BASE_URL: ${{ steps.router-creds.outputs.LOCAL_FABRIC_BASE_URL }}
+          API_KEY: ${{ steps.router-creds.outputs.LOCAL_FABRIC_API_KEY }}
+        run: |
+          test -n "$BASE_URL" || { echo "::error::OpenBao did not return LOCAL_FABRIC_BASE_URL" >&2; exit 1; }
+          test -n "$API_KEY" || { echo "::error::OpenBao did not return LOCAL_FABRIC_API_KEY" >&2; exit 1; }
+
       - name: Check optional large capability
         id: capability
         env:
           MODEL: ${{ matrix.model }}
+          LOCAL_FABRIC_BASE_URL: ${{ steps.router-creds.outputs.LOCAL_FABRIC_BASE_URL }}
+          LOCAL_FABRIC_API_KEY: ${{ steps.router-creds.outputs.LOCAL_FABRIC_API_KEY }}
         run: |
           if [ "$MODEL" != large ]; then
             echo "available=true" >> "$GITHUB_OUTPUT"
@@ -73,7 +112,7 @@ jobs:
           node-version: 22
 
       - name: Run Hermes fabric suite
-        if: steps.capability.outputs.available == 'true'
+        if: ${{ !cancelled() && steps.capability.outputs.available == 'true' }}
         uses: promptfoo/promptfoo-action@04839e664f52212b877170219dab0d7ad2bf6440 # v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -85,14 +124,102 @@ jobs:
           no-share: true
           disable-comment: true
         env:
+          LOCAL_FABRIC_BASE_URL: ${{ steps.router-creds.outputs.LOCAL_FABRIC_BASE_URL }}
+          LOCAL_FABRIC_API_KEY: ${{ steps.router-creds.outputs.LOCAL_FABRIC_API_KEY }}
           PROMPTFOO_OUTPUT_PATH: results/hermes-${{ matrix.model }}-${{ steps.run-date.outputs.date }}.json
 
-      - name: Upload Hermes results
-        if: always() && steps.capability.outputs.available == 'true' && hashFiles(format('results/hermes-{0}-{1}.json', matrix.model, steps.run-date.outputs.date)) != ''
+      - name: Run Triage fabric suite
+        if: ${{ !cancelled() && steps.capability.outputs.available == 'true' }}
+        uses: promptfoo/promptfoo-action@04839e664f52212b877170219dab0d7ad2bf6440 # v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          config: evals/triage/promptfooconfig.yaml
+          cache-path: .promptfoo-cache
+          promptfoo-version: 0.124.1
+          use-config-prompts: true
+          force-run: true
+          no-share: true
+          disable-comment: true
+        env:
+          LOCAL_FABRIC_BASE_URL: ${{ steps.router-creds.outputs.LOCAL_FABRIC_BASE_URL }}
+          LOCAL_FABRIC_API_KEY: ${{ steps.router-creds.outputs.LOCAL_FABRIC_API_KEY }}
+          PROMPTFOO_OUTPUT_PATH: results/triage-${{ matrix.model }}-${{ steps.run-date.outputs.date }}.json
+
+      - name: Run SPL fabric suite
+        if: ${{ !cancelled() && steps.capability.outputs.available == 'true' }}
+        uses: promptfoo/promptfoo-action@04839e664f52212b877170219dab0d7ad2bf6440 # v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          config: evals/spl/promptfooconfig.yaml
+          cache-path: .promptfoo-cache
+          promptfoo-version: 0.124.1
+          use-config-prompts: true
+          force-run: true
+          no-share: true
+          disable-comment: true
+        env:
+          LOCAL_FABRIC_BASE_URL: ${{ steps.router-creds.outputs.LOCAL_FABRIC_BASE_URL }}
+          LOCAL_FABRIC_API_KEY: ${{ steps.router-creds.outputs.LOCAL_FABRIC_API_KEY }}
+          PROMPTFOO_OUTPUT_PATH: results/spl-${{ matrix.model }}-${{ steps.run-date.outputs.date }}.json
+
+      - name: Run Agentic fabric suite
+        if: ${{ !cancelled() && steps.capability.outputs.available == 'true' }}
+        uses: promptfoo/promptfoo-action@04839e664f52212b877170219dab0d7ad2bf6440 # v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          config: evals/agentic/promptfooconfig.yaml
+          cache-path: .promptfoo-cache
+          promptfoo-version: 0.124.1
+          use-config-prompts: true
+          force-run: true
+          no-share: true
+          disable-comment: true
+        env:
+          LOCAL_FABRIC_BASE_URL: ${{ steps.router-creds.outputs.LOCAL_FABRIC_BASE_URL }}
+          LOCAL_FABRIC_API_KEY: ${{ steps.router-creds.outputs.LOCAL_FABRIC_API_KEY }}
+          PROMPTFOO_OUTPUT_PATH: results/agentic-${{ matrix.model }}-${{ steps.run-date.outputs.date }}.json
+
+      - name: Run Tool-queries fabric suite
+        if: ${{ !cancelled() && steps.capability.outputs.available == 'true' }}
+        uses: promptfoo/promptfoo-action@04839e664f52212b877170219dab0d7ad2bf6440 # v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          config: evals/tool-queries/promptfooconfig.yaml
+          cache-path: .promptfoo-cache
+          promptfoo-version: 0.124.1
+          use-config-prompts: true
+          force-run: true
+          no-share: true
+          disable-comment: true
+        env:
+          LOCAL_FABRIC_BASE_URL: ${{ steps.router-creds.outputs.LOCAL_FABRIC_BASE_URL }}
+          LOCAL_FABRIC_API_KEY: ${{ steps.router-creds.outputs.LOCAL_FABRIC_API_KEY }}
+          PROMPTFOO_OUTPUT_PATH: results/tool-queries-${{ matrix.model }}-${{ steps.run-date.outputs.date }}.json
+
+      - name: Run Agentic MCP fabric suite
+        if: ${{ !cancelled() && steps.capability.outputs.available == 'true' }}
+        uses: promptfoo/promptfoo-action@04839e664f52212b877170219dab0d7ad2bf6440 # v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          config: evals/agentic-mcp/promptfooconfig.yaml
+          cache-path: .promptfoo-cache
+          promptfoo-version: 0.124.1
+          use-config-prompts: true
+          force-run: true
+          no-share: true
+          disable-comment: true
+        env:
+          LOCAL_FABRIC_BASE_URL: ${{ steps.router-creds.outputs.LOCAL_FABRIC_BASE_URL }}
+          LOCAL_FABRIC_API_KEY: ${{ steps.router-creds.outputs.LOCAL_FABRIC_API_KEY }}
+          PROMPTFOO_OUTPUT_PATH: results/agentic-mcp-${{ matrix.model }}-${{ steps.run-date.outputs.date }}.json
+
+      - name: Upload benchmark results
+        if: always() && steps.capability.outputs.available == 'true'
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
-          name: hermes-${{ matrix.model }}-${{ steps.run-date.outputs.date }}
-          path: results/hermes-${{ matrix.model }}-${{ steps.run-date.outputs.date }}.json
+          name: benchmark-${{ matrix.model }}-${{ steps.run-date.outputs.date }}
+          path: results/*-${{ matrix.model }}-${{ steps.run-date.outputs.date }}.json
+          if-no-files-found: ignore
 
       - name: Write pass-rate summary
         if: always()
@@ -109,17 +236,21 @@ jobs:
             fi
             echo "| Suite | Pass | Fail | Errors | Pass rate |"
             echo "| --- | ---: | ---: | ---: | ---: |"
-            file="results/hermes-${MODEL}-${RUN_DATE}.json"
-            if [ -f "$file" ]; then
-              jq -r '
-                (.results.stats // .stats // {}) as $stats
-                | ($stats.successes // 0) as $passed
-                | ($stats.failures // 0) as $failed
-                | ($stats.errors // 0) as $errors
-                | ($passed + $failed + $errors) as $total
-                | "| Hermes | \($passed) | \($failed) | \($errors) | \(if $total == 0 then "n/a" else (((10000 * $passed / $total) | round) / 100 | tostring) + "%" end) |"
-              ' "$file"
-            else
-              echo "| Hermes | — | — | — | no result |"
-            fi
+            suites=(hermes triage spl agentic tool-queries agentic-mcp)
+            labels=(Hermes Triage SPL Agentic "Tool queries" "Agentic MCP")
+            for i in "${!suites[@]}"; do
+              file="results/${suites[$i]}-${MODEL}-${RUN_DATE}.json"
+              if [ -f "$file" ]; then
+                jq -r --arg name "${labels[$i]}" '
+                  (.results.stats // .stats // {}) as $stats
+                  | ($stats.successes // 0) as $passed
+                  | ($stats.failures // 0) as $failed
+                  | ($stats.errors // 0) as $errors
+                  | ($passed + $failed + $errors) as $total
+                  | "| \($name) | \($passed) | \($failed) | \($errors) | \(if $total == 0 then "n/a" else (((10000 * $passed / $total) | round) / 100 | tostring) + "%" end) |"
+                ' "$file"
+              else
+                echo "| ${labels[$i]} | — | — | — | no result |"
+              fi
+            done
           } >> "$GITHUB_STEP_SUMMARY"
