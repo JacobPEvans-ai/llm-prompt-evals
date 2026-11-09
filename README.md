@@ -123,6 +123,12 @@ instruction-following, grounded Q&A, tool calls). Copy an entry, change the
 against a local model on the self-hosted runner. Fork pull requests never receive
 secrets.
 
+The scheduled local benchmark runs the Hermes fabric suite every six hours for
+the medium and small router capabilities, and for large when the router serves
+it. Each run uploads a JSON artifact named for its suite, capability, and run
+date, and adds a pass-rate table to the workflow summary. Triage, SPL, agentic,
+and tool-queries are not yet part of the local benchmark.
+
 ## Contributing
 
 Work on a feature branch off `develop` and open a pull request; never push to the

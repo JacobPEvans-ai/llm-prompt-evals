@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/dryvist/llm-prompt-evals/compare/v0.5.1...v0.6.0) (2026-11-09)
+
+
+### Features
+
+* **eval:** schedule a local benchmark matrix every six hours ([#172](https://github.com/dryvist/llm-prompt-evals/issues/172)) ([d2da109](https://github.com/dryvist/llm-prompt-evals/commit/d2da109fdd89f3cf2a026532e666cabb4ecd9009))
+
 ## [0.5.1](https://github.com/dryvist/llm-prompt-evals/compare/v0.5.0...v0.5.1) (2026-11-05)
 
 
