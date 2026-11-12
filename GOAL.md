@@ -51,4 +51,4 @@ against the canonical version — not a second copy of the source of truth.
 - CI runs the cloud matrix on same-repo pull requests and a gated fabric job on
   the self-hosted runner, with no secrets or endpoints in the repo.
 - The "LLM prompt evaluation" page exists in `dryvist/docs` and
-  `dryvist/docs-starlight`.
+  the private docs site.
