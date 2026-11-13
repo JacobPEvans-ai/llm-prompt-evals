@@ -1,8 +1,9 @@
 # yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
-description: "Demo: 11 Hermes prompts (base + AI-authored + merged) x 3 runners"
+description: "Demo: Hermes prompts (base + AI-authored + merged) across runners"
 
-# 11 contestants, same loader, different source file. base = control; nine are
-# each a different AI model's rewrite; merged-v2 = Opus synthesis of opus+haiku.
+# Contestants share one loader and differ by source file. base = control; the
+# rest are each a different AI model's rewrite; merged-v2 = Opus synthesis of
+# opus+haiku.
 prompts:
   - id: &loader file://../../prompts/load_okf.py:load_prompt
     label: base
@@ -41,9 +42,11 @@ prompts:
     label: fable-5
     config: { okf: variants/logmon/fable.md }
 
-# Three runners. Opus 4.8 is the real intended consumer (primary); the two cheap
+# Runners. Opus 4.8 is the real intended consumer (primary); the cheap
 # current-gen flash models test whether a winning prompt GENERALIZES across
-# runners. Holding these constant per column isolates the prompt.
+# runners; the Qwen max models are aliases on the org's OpenAI-compatible
+# router (cloud, not OpenRouter). Holding these constant per column isolates
+# the prompt.
 providers:
   - id: openrouter:anthropic/claude-opus-4.8
     label: opus-4.8-SUT
@@ -54,6 +57,19 @@ providers:
   - id: openrouter:deepseek/deepseek-v4-flash
     label: deepseek-flash-SUT
     config: { temperature: 0, max_tokens: 1200 }
+  # Router aliases, not OpenRouter ids. Endpoint and key come from the
+  # environment (LLM_ROUTER_BASE_URL / LLM_ROUTER_API_KEY); the unset default
+  # fails loudly instead of falling back to another endpoint.
+  - id: openai:chat:qwen4-max-preview
+    label: qwen4-max-preview-SUT
+    config: &qwen-router
+      apiBaseUrl: "{{ env.LLM_ROUTER_BASE_URL | default('http://llm-router-unset.invalid/v1', true) }}"
+      apiKeyEnvar: LLM_ROUTER_API_KEY
+      temperature: 0
+      max_tokens: 1200
+  - id: openai:chat:qwen3.8-max
+    label: qwen3.8-max-SUT
+    config: *qwen-router
 
 defaultTest:
   options:
