@@ -1,8 +1,9 @@
 # yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
-description: "Demo: 12 Hermes prompts (base + AI-authored + merged) x 5 runners"
+description: "Demo: Hermes prompts (base + AI-authored + merged) across runners"
 
-# 12 contestants, same loader, different source file. base = control; nine are
-# each a different AI model's rewrite; merged-v2 = Opus synthesis of opus+haiku.
+# Contestants share one loader and differ by source file. base = control; the
+# rest are each a different AI model's rewrite; merged-v2 = Opus synthesis of
+# opus+haiku.
 prompts:
   - id: &loader file://../../prompts/load_okf.py:load_prompt
     label: base
@@ -41,9 +42,9 @@ prompts:
     label: fable-5
     config: { okf: variants/logmon/fable.md }
 
-# Five runners. Opus 4.8 is the real intended consumer (primary); the two cheap
+# Runners. Opus 4.8 is the real intended consumer (primary); the cheap
 # current-gen flash models test whether a winning prompt GENERALIZES across
-# runners; the two Qwen max models are aliases on the org's OpenAI-compatible
+# runners; the Qwen max models are aliases on the org's OpenAI-compatible
 # router (cloud, not OpenRouter). Holding these constant per column isolates
 # the prompt.
 providers:

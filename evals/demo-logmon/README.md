@@ -2,14 +2,12 @@
 
 One log-monitoring ("Hermes") base prompt rewritten by many AI models, every
 rewrite scored on the same tests across several runner models. The published
-report is `results/README.md`. Three configs share the prompt loader:
+report is `results/README.md`. These configs share the prompt loader:
 
-- `promptfooconfig.yaml` — base tier, `tests.yaml` (15 cases), all five
-  runners.
-- `promptfooconfig.hard.yaml` — hard tier, `tests-hard.yaml` (8 cases), all
-  five runners.
+- `promptfooconfig.yaml` — base tier, `tests.yaml`, every runner.
+- `promptfooconfig.hard.yaml` — hard tier, `tests-hard.yaml`, every runner.
 - `promptfooconfig.fable.yaml` — premium-runner pass, `tests.yaml` on a
-  curated 6-prompt subset, `fable-5-SUT` only.
+  curated prompt subset, `fable-5-SUT` only.
 
 Runner labels (`--filter-providers` accepts a label or a provider id):
 
@@ -45,8 +43,8 @@ promptfoo eval -c evals/demo-logmon/promptfooconfig.hard.yaml \
 ```
 
 For `qwen3.8-max`, use `--filter-providers qwen3.8-max-SUT` and the
-`output/qwen3.8-max-*.json` names. Omit `--filter-providers` to run all five
-runners in one pass.
+`output/qwen3.8-max-*.json` names. Omit `--filter-providers` to run every
+runner in one pass.
 
 ## Where results land
 
