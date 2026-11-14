@@ -13,12 +13,13 @@ prompts:
     config:
       okf: variants/hermes/candidate-a.md
 
-# System under test: the org router's medium role (local and CI alike). To
+# System under test: a cloud model through the org router (local and CI alike). To
 # evaluate against OpenRouter, the direct Anthropic API or the local fabric
-# instead, point this at providers/openrouter.yaml, providers/cloud.yaml or
+# instead, point this at providers/router.yaml (the local medium role),
+# providers/openrouter.yaml, providers/cloud.yaml or
 # providers/local.yaml (see those files).
 providers:
-  - file://../../providers/router.yaml
+  - file://../../providers/router-cloud.yaml
 
 defaultTest:
   options:
@@ -38,3 +39,7 @@ tests:
   - file://../../datasets/instruction.yaml
   - file://../../datasets/homelab_qa.yaml
   - file://../../datasets/tool_call.yaml
+
+# Two at a time keeps the cloud model under its rate limit.
+evaluateOptions:
+  maxConcurrency: 2
