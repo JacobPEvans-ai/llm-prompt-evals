@@ -23,7 +23,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    timeout-minutes: 300
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 5 || 300 }}
     strategy:
       fail-fast: false
       max-parallel: 1
