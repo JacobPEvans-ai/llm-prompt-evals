@@ -13,20 +13,23 @@ prompts:
     config:
       okf: variants/hermes/candidate-a.md
 
-# Systems under test: a Claude-family and an OpenAI-family model, both through
-# OpenRouter, so the whole matrix runs on one funded key (local and CI alike).
-# To evaluate against the direct Anthropic API or the local fabric instead, point
-# this at providers/cloud.yaml or providers/local.yaml (see those files).
+# System under test: a cloud model through the org router (local and CI alike). To
+# evaluate against OpenRouter, the direct Anthropic API or the local fabric
+# instead, point this at providers/router.yaml (the local medium role),
+# providers/openrouter.yaml, providers/cloud.yaml or
+# providers/local.yaml (see those files).
 providers:
-  - file://../../providers/openrouter.yaml
+  - file://../../providers/router-cloud.yaml
 
 defaultTest:
   options:
-    # llm-rubric grader: a pinned cheap OpenRouter model. Kept separate from the
-    # systems under test so grading cost and behavior are stable.
+    # llm-rubric grader: the router's judge role, kept separate from the system
+    # under test. Fails closed when LLM_ROUTER_BASE_URL is unset.
     provider:
-      id: openrouter:mistralai/mistral-small-24b-instruct-2501
+      id: openai:chat:judge
       config:
+        apiBaseUrl: "{{ env.LLM_ROUTER_BASE_URL | default('http://llm-router-unset.invalid/v1', true) }}"
+        apiKeyEnvar: LLM_ROUTER_API_KEY
         temperature: 0
 
 # The curated hermes suite plus the ported mlx-benchmarks probe banks.
@@ -36,3 +39,7 @@ tests:
   - file://../../datasets/instruction.yaml
   - file://../../datasets/homelab_qa.yaml
   - file://../../datasets/tool_call.yaml
+
+# Two at a time keeps the cloud model under its rate limit.
+evaluateOptions:
+  maxConcurrency: 2
