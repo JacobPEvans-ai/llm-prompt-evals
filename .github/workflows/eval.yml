@@ -19,7 +19,7 @@ jobs:
   cloud:
     if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: review
-    timeout-minutes: 10
+    timeout-minutes: 5
     permissions:
       contents: read
       pull-requests: write # promptfoo-action posts the results comment
@@ -39,8 +39,8 @@ jobs:
       - uses: promptfoo/promptfoo-action@04839e664f52212b877170219dab0d7ad2bf6440 # v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          # The default config runs the router's medium role, graded by its
-          # judge role. See providers/router.yaml.
+          # The default config runs a cloud model through the router, graded by its
+          # judge role. See providers/router-cloud.yaml.
           config: evals/hermes/promptfooconfig.yaml
           cache-path: .promptfoo-cache
           # Keep in sync with `promptfooVersion` in flake.nix, so local and CI match.
