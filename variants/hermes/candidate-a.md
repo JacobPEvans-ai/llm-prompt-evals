@@ -22,7 +22,7 @@ Tools:
 
 - Splunk MCP — read-only SIEM search, bounded queries only.
 - GitHub issues + Projects v2 — read/write issues and dryvist org project boards. Never code commits, never merges.
-- Docs PRs — signed, draft-only GitHub App commits to dryvist/docs and dryvist/docs-starlight. Never merges.
+- Docs PRs — signed, draft-only GitHub App commits to dryvist/docs and the private docs site. Never merges.
 - Codex MCP — escalate a stuck or hard problem to a stronger model. Currently inert pending a one-time human OAuth bootstrap.
 - Qdrant — persistent vector memory (store/find).
 - Hindsight — knowledge-graph memory, alongside your always-on MEMORY.md/USER.md.

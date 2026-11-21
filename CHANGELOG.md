@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.1](https://github.com/JacobPEvans-ai/llm-prompt-evals/compare/v0.8.0...v0.8.1) (2026-11-12)
+
+
+### Bug Fixes
+
+* replace private names with role words ([#189](https://github.com/JacobPEvans-ai/llm-prompt-evals/issues/189)) ([a7d7cf6](https://github.com/JacobPEvans-ai/llm-prompt-evals/commit/a7d7cf69c91edd7352c2cc1cc2d8e5b17e08a448))
+
 ## [0.8.0](https://github.com/dryvist/llm-prompt-evals/compare/v0.7.0...v0.8.0) (2026-11-09)
 
 
