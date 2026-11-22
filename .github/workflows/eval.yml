@@ -14,8 +14,7 @@ permissions:
 
 jobs:
   # Router evaluation. Secrets are exposed here, so this job runs ONLY on
-  # same-repo pull requests — fork PRs never reach it. The review pool reaches
-  # the router; hosted runners do not.
+  # same-repo pull requests — fork PRs never reach it.
   router:
     if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: review
