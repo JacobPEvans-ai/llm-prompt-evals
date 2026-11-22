@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   benchmark:
-    runs-on: [self-hosted, Linux]
+    runs-on: review
     permissions:
       contents: read
       id-token: write
