@@ -13,20 +13,18 @@ prompts:
     config:
       okf: variants/hermes/candidate-a.md
 
-# System under test: a cloud model through the org router (local and CI alike). To
-# evaluate against OpenRouter, the direct Anthropic API or the local fabric
-# instead, point this at providers/router.yaml (the local medium role),
-# providers/openrouter.yaml, providers/cloud.yaml or
-# providers/local.yaml (see those files).
+# System under test: the org router's medium role (local models first; the router
+# alone decides any fallback). Never point CI at a cloud provider directly.
+# providers/openrouter.yaml and providers/cloud.yaml are manual opt-ins only.
 providers:
-  - file://../../providers/router-cloud.yaml
+  - file://../../providers/router.yaml
 
 defaultTest:
   options:
-    # llm-rubric grader: the router's judge role, kept separate from the system
-    # under test. Fails closed when LLM_ROUTER_BASE_URL is unset.
+    # llm-rubric grader: the router's medium role, as in the fabric config. Fails
+    # closed when LLM_ROUTER_BASE_URL is unset.
     provider:
-      id: openai:chat:judge
+      id: openai:chat:medium
       config:
         apiBaseUrl: "{{ env.LLM_ROUTER_BASE_URL | default('http://llm-router-unset.invalid/v1', true) }}"
         apiKeyEnvar: LLM_ROUTER_API_KEY
@@ -40,6 +38,6 @@ tests:
   - file://../../datasets/homelab_qa.yaml
   - file://../../datasets/tool_call.yaml
 
-# Two at a time keeps the cloud model under its rate limit.
+# Four at a time fits the five-minute pull request budget on local models.
 evaluateOptions:
-  maxConcurrency: 2
+  maxConcurrency: 4

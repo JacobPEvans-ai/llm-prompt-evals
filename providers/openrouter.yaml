@@ -1,7 +1,6 @@
-# OpenRouter-only provider set for CI. Both a Claude-family and an OpenAI-family
-# model run through OpenRouter, so the cloud job gets a cross-family matrix on the
-# single funded OPENROUTER_API_KEY. The direct anthropic: provider (providers/
-# cloud.yaml) needs a real Anthropic API key and is used for local full runs.
+# OpenRouter provider set: a manual opt-in for local runs only. No CI job or
+# default config uses it; the default is providers/router.yaml (the org router,
+# local models first). Needs OPENROUTER_API_KEY in your environment.
 #
 # Both carry the tool registry (OpenAI function format) matching the tool_call
 # probes: get_weather(location), search_docs(query).

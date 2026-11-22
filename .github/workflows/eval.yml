@@ -16,7 +16,7 @@ jobs:
   # Router evaluation. Secrets are exposed here, so this job runs ONLY on
   # same-repo pull requests — fork PRs never reach it. The review pool reaches
   # the router; hosted runners do not.
-  cloud:
+  router:
     if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: review
     timeout-minutes: 5
@@ -39,8 +39,8 @@ jobs:
       - uses: promptfoo/promptfoo-action@04839e664f52212b877170219dab0d7ad2bf6440 # v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          # The default config runs a cloud model through the router, graded by its
-          # judge role. See providers/router-cloud.yaml.
+          # The default config runs the router's medium role (local models first),
+          # graded by the same role. See providers/router.yaml.
           config: evals/hermes/promptfooconfig.yaml
           cache-path: .promptfoo-cache
           # Keep in sync with `promptfooVersion` in flake.nix, so local and CI match.
@@ -89,7 +89,5 @@ jobs:
           force-run: true
           disable-comment: true
           fail-on-threshold: 85
-        env:
-          # LOCAL_FABRIC_BASE_URL and LOCAL_FABRIC_MODEL are read from the
-          # environment. OPENROUTER_API_KEY drives the llm-rubric grader.
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        # LOCAL_FABRIC_BASE_URL and LOCAL_FABRIC_MODEL are read from the runner
+        # environment; the llm-rubric grader is the local fabric too.
