@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.4](https://github.com/JacobPEvans-ai/llm-prompt-evals/compare/v0.8.3...v0.8.4) (2026-11-23)
+
+
+### Bug Fixes
+
+* **ci:** run the self-hosted jobs on the review runner pool ([#206](https://github.com/JacobPEvans-ai/llm-prompt-evals/issues/206)) ([3d35a6a](https://github.com/JacobPEvans-ai/llm-prompt-evals/commit/3d35a6a7845dd3fd99c64a7efd65f2551f7eb7de))
+
 ## [0.8.3](https://github.com/JacobPEvans-ai/llm-prompt-evals/compare/v0.8.2...v0.8.3) (2026-11-23)
 
 
