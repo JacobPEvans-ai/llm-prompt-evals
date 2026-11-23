@@ -118,10 +118,10 @@ instruction-following, grounded Q&A, tool calls). Copy an entry, change the
 
 ## CI
 
-`.github/workflows/eval.yml` runs the eval on pull requests across two models
-(a Claude-family and an OpenAI-family model, both via OpenRouter) and, on demand,
-against a local model on the self-hosted runner. Fork pull requests never receive
-secrets.
+`.github/workflows/eval.yml` runs the eval on pull requests against the org
+router's medium role (local models first; the router decides any fallback) and,
+on demand, against a local model on the self-hosted runner. Fork pull requests
+never receive secrets.
 
 The scheduled local benchmark runs the Hermes fabric suite every six hours for
 the medium and small router capabilities, and for large when the router serves
