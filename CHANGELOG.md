@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.0](https://github.com/JacobPEvans-ai/llm-prompt-evals/compare/v0.8.4...v0.9.0) (2026-11-23)
+
+
+### Features
+
+* **evals:** add org-router Qwen runners to the demo-logmon suite ([#194](https://github.com/JacobPEvans-ai/llm-prompt-evals/issues/194)) ([540194e](https://github.com/JacobPEvans-ai/llm-prompt-evals/commit/540194e2d2b0b2307d23b294c049aad2b280fefd))
+
 ## [0.8.4](https://github.com/JacobPEvans-ai/llm-prompt-evals/compare/v0.8.3...v0.8.4) (2026-11-23)
 
 
