@@ -113,7 +113,7 @@ jobs:
 
       - name: Run Hermes fabric suite
         if: ${{ !cancelled() && steps.capability.outputs.available == 'true' }}
-        uses: promptfoo/promptfoo-action@04839e664f52212b877170219dab0d7ad2bf6440 # v1
+        uses: promptfoo/promptfoo-action@f995424d723495ad12bea6d34d30be3070ff0d48 # v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           config: evals/hermes/promptfooconfig.fabric.yaml
@@ -130,7 +130,7 @@ jobs:
 
       - name: Run Triage fabric suite
         if: ${{ !cancelled() && steps.capability.outputs.available == 'true' }}
-        uses: promptfoo/promptfoo-action@04839e664f52212b877170219dab0d7ad2bf6440 # v1
+        uses: promptfoo/promptfoo-action@f995424d723495ad12bea6d34d30be3070ff0d48 # v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           config: evals/triage/promptfooconfig.yaml
@@ -147,7 +147,7 @@ jobs:
 
       - name: Run SPL fabric suite
         if: ${{ !cancelled() && steps.capability.outputs.available == 'true' }}
-        uses: promptfoo/promptfoo-action@04839e664f52212b877170219dab0d7ad2bf6440 # v1
+        uses: promptfoo/promptfoo-action@f995424d723495ad12bea6d34d30be3070ff0d48 # v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           config: evals/spl/promptfooconfig.yaml
@@ -164,7 +164,7 @@ jobs:
 
       - name: Run Agentic fabric suite
         if: ${{ !cancelled() && steps.capability.outputs.available == 'true' }}
-        uses: promptfoo/promptfoo-action@04839e664f52212b877170219dab0d7ad2bf6440 # v1
+        uses: promptfoo/promptfoo-action@f995424d723495ad12bea6d34d30be3070ff0d48 # v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           config: evals/agentic/promptfooconfig.yaml
@@ -181,7 +181,7 @@ jobs:
 
       - name: Run Tool-queries fabric suite
         if: ${{ !cancelled() && steps.capability.outputs.available == 'true' }}
-        uses: promptfoo/promptfoo-action@04839e664f52212b877170219dab0d7ad2bf6440 # v1
+        uses: promptfoo/promptfoo-action@f995424d723495ad12bea6d34d30be3070ff0d48 # v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           config: evals/tool-queries/promptfooconfig.yaml
@@ -198,7 +198,7 @@ jobs:
 
       - name: Run Agentic MCP fabric suite
         if: ${{ !cancelled() && steps.capability.outputs.available == 'true' }}
-        uses: promptfoo/promptfoo-action@04839e664f52212b877170219dab0d7ad2bf6440 # v1
+        uses: promptfoo/promptfoo-action@f995424d723495ad12bea6d34d30be3070ff0d48 # v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           config: evals/agentic-mcp/promptfooconfig.yaml
