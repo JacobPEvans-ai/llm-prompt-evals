@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.3](https://github.com/JacobPEvans-ai/llm-prompt-evals/compare/v0.8.2...v0.8.3) (2026-11-23)
+
+
+### Bug Fixes
+
+* **eval:** run the pull request eval on the router's local medium role ([#198](https://github.com/JacobPEvans-ai/llm-prompt-evals/issues/198)) ([a933d49](https://github.com/JacobPEvans-ai/llm-prompt-evals/commit/a933d497899e4b351bb718550cc06183c7c1e6e0))
+
 ## [0.8.2](https://github.com/JacobPEvans-ai/llm-prompt-evals/compare/v0.8.1...v0.8.2) (2026-11-22)
 
 
