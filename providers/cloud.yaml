@@ -1,4 +1,5 @@
-# Cloud providers: the systems under test. Referenced from evals/*/promptfooconfig.yaml.
+# Direct cloud providers: a manual opt-in for local runs only. No CI job or default
+# config uses them; the default is providers/router.yaml (the org router).
 #
 # Both carry the same two-tool registry as the mlx-benchmarks tool_call probes:
 #   get_weather(location)  and  search_docs(query)  — both required-arg.
