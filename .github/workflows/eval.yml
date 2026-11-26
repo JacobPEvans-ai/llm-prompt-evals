@@ -26,7 +26,10 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           submodules: true
-      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+          persist-credentials: false
+      # Cache Promptfoo request results; npx has a separate npm package cache below.
+      - id: promptfoo-cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: .promptfoo-cache
           key: ${{ runner.os }}-promptfoo-${{ hashFiles('evals/**', 'datasets/**', 'providers/**', 'prompts/**', 'variants/**', '.gitmodules') }}
@@ -35,12 +38,18 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: 22
+      # Cache npx installs in ~/.npm; Promptfoo eval results use the cache above.
+      - id: promptfoo-npm-cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-promptfoo-npm-${{ hashFiles('flake.nix') }}
+          restore-keys: ${{ runner.os }}-promptfoo-npm-
       - uses: promptfoo/promptfoo-action@f995424d723495ad12bea6d34d30be3070ff0d48 # v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          # The default config runs the router's medium role (local models first),
-          # graded by the same role. See providers/router.yaml.
-          config: evals/hermes/promptfooconfig.yaml
+          # The PR config runs the medium role on five cases; the full config stays unchanged.
+          config: evals/hermes/promptfooconfig.router-pr.yaml
           cache-path: .promptfoo-cache
           # Keep in sync with `promptfooVersion` in flake.nix, so local and CI match.
           promptfoo-version: 0.124.1
@@ -56,6 +65,18 @@ jobs:
           # one is set, and `promptfoo share` requires a Cloud account — a paid,
           # custom-priced tier. On the free Community tier the share always
           # fails, so the PR comment below plus results/ are the report.
+      - name: Save Promptfoo evaluation cache
+        if: ${{ always() && steps.promptfoo-cache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+        with:
+          path: .promptfoo-cache
+          key: ${{ runner.os }}-promptfoo-${{ hashFiles('evals/**', 'datasets/**', 'providers/**', 'prompts/**', 'variants/**', '.gitmodules') }}
+      - name: Save Promptfoo npx install cache
+        if: ${{ always() && steps.promptfoo-npm-cache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-promptfoo-npm-${{ hashFiles('flake.nix') }}
 
   # Local fabric evaluation on the self-hosted homelab runner. The fabric base
   # URL and model come only from the runner environment — never from the repo.
@@ -73,6 +94,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           submodules: true
+          persist-credentials: false
       # promptfoo-action runs npx; the self-hosted runner image ships no Node.
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
